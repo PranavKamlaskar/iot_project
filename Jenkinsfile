@@ -33,7 +33,7 @@ pipeline {
                 echo 'Running Django migrations...'
 		
                 sh '''
-                    ../venv/bin/python manage.py migrate
+                    ./venv/bin/python manage.py migrate
                 '''
 		
             }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 echo 'Collecting static files...'
 		
-                sh '../venv/bin/python manage.py collectstatic --noinput'
+                sh './venv/bin/python manage.py collectstatic --noinput'
 		
             }
         }
