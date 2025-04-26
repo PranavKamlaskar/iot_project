@@ -31,7 +31,10 @@ pipeline {
         stage('Run Django Migrations') {
             steps {
                 echo 'Running Django migrations...'
-                sh './venv/bin/python manage.py migrate'
+                sh '''
+                    source venv/bin/activate
+                    ./venv/bin/python manage.py migrate
+                '''
             }
         }
 
