@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo 'Running Django migrations...'
                 sh '''
-                    cd iot_project
+                    
                     ./venv/bin/python manage.py migrate
                 '''
             }
@@ -48,7 +48,7 @@ pipeline {
             steps {
                 echo 'Collecting static files...'
                 sh '''
-                    cd iot_project
+                    
                     ./venv/bin/python manage.py collectstatic --noinput
                 '''
             }
