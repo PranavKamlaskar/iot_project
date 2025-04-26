@@ -31,10 +31,11 @@ pipeline {
         stage('Run Django Migrations') {
             steps {
                 echo 'Running Django migrations...'
+		dir('iot_project'){
                 sh '''
-                    . venv/bin/activate
                     ./venv/bin/python manage.py migrate
                 '''
+		}
             }
         }
 
