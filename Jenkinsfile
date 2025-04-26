@@ -17,7 +17,7 @@ pipeline {
             steps {
                 echo 'Creating virtual environment...'
                 sh '''
-                    cd iot_project
+                    
                     python3 -m venv venv
                     ./venv/bin/pip install --upgrade pip
                 '''
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 echo 'Installing Python packages...'
                 sh '''
-                    cd iot_project
+                    
                     ./venv/bin/pip install -r requirements.txt
                 '''
             }
