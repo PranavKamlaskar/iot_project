@@ -1,0 +1,85 @@
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl git -y
+sudo apt install python3-venv -y
+sudo -u postgres psql
+CREATE DATABASE iotdb;
+CREATE USER iotuser WITH PASSWORD 'iotpassword';
+ALTER ROLE iotuser SET client_encoding TO 'utf8';
+ALTER ROLE iotuser SET default_transaction_isolation TO 'read committed';
+ALTER ROLE iotuser SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE iotdb TO iotuser;
+\q
+sudo -u postgres psql
+\c iotdb
+GRANT ALL PRIVILEGES ON SCHEMA public TO iotuser;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO iotuser;
+ALTER SCHEMA public OWNER TO iotuser;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO iotuser;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO iotuser;
+\q
+mkdir ~/iot_project && cd ~/iot_project
+python3 -m venv venv
+source venv/bin/activate
+pip install django djangorestframework psycopg2-binary gunicorn Pillow
+django-admin startproject iot_backend .
+python manage.py startapp api
+vim iot_backend/settings.py        <!---checkout the file--->
+vim api/urls.py                     <!---checkout the file--->
+vim api/views.py                          <!---checkout the file--->
+vim iot_backend/urls.py                   <!---checkout the file--->
+python manage.py migrate
+python manage.py collectstatic
+sudo vim /etc/systemd/system/gunicorn.socket            <!---checkout the file--->
+sudo vim /etc/systemd/system/gunicorn.service            <!---checkout the file--->
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
+sudo vim /etc/nginx/sites-available/iot_project            <!---checkout the file--->
+sudo ln -s /etc/nginx/sites-available/iot_project /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+deactivate
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee   /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]   https://pkg.jenkins.io/debian-stable binary/ | sudo tee   /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt update
+sudo apt install jenkins -y
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+sudo systemctl status jenkins
+Visit Jenkins: http://<your-server-ip>:8080
+sudo vim /var/lib/jenkins/secrets/initialAdminPassword
+sudo usermod -aG www-data jenkins
+sudo update-alternatives --config editor
+sudo visudo
+Add this at the bottom: jenkins ALL=(ALL) NOPASSWD: /bin/systemctl restart gunicorn.socket
+cd ~/iot_project
+git init
+git remote add origin https://github.com/your-username/iot-project.git
+git add .
+git commit -m "Initial commit"
+git push -u origin main
+
+Login to Jenkins (http://your-server-ip:8080)
+Click "New Item" from the dashboard
+In "Enter an item name", type:
+ iot_project
+Select Pipeline (not Freestyle Project)
+➡️ Then click OK
+Inside the job configuration page:
+Description (optional):
+"Pipeline for IoT Project Django backend deployment"
+Scroll down to Pipeline section:
+Definition → Choose Pipeline script from SCM
+SCM → Choose Git
+Repository URL → Paste your GitHub Repo URL, like:
+arduino
+https://github.com/your-username/iot-project.git
+Branch Specifier → Keep it as:
+*/main
+Script Path → Keep it as:
+Jenkinsfile
+(we'll create it next if you don't have yet)
+Save the job.
+
+vim Jenkinsfile            <!---checkout the file--->
