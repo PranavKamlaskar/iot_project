@@ -57,7 +57,7 @@ pipeline {
         stage('Restart Gunicorn') {
             steps {
                 echo 'Restarting Gunicorn...'
-                sh 'sudo systemctl restart gunicorn'
+                sh 'sudo -n systemctl restart gunicorn'
             }
         }
     }
