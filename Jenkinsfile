@@ -2,9 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_DIR = "/home/ubuntu/iot_project"
-        VENV_DIR = "/home/ubuntu/iot_project/venv"
-        GUNICORN_SOCKET = "/home/ubuntu/iot_project/iot_backend.sock"
+        DJANGO_SETTINGS_MODULE = "iot_project.settings"
     }
 
     stages {
@@ -15,24 +13,32 @@ pipeline {
             }
         }
 
+        stage('Setup Virtual Environment') {
+            steps {
+                echo 'Creating virtual environment...'
+                sh 'python3 -m venv venv'
+                sh './venv/bin/pip install --upgrade pip'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Python packages...'
-                sh '${VENV_DIR}/bin/pip install -r ${PROJECT_DIR}/requirements.txt'
+                sh './venv/bin/pip install -r requirements.txt'
             }
         }
 
         stage('Run Django Migrations') {
             steps {
-                echo 'Applying Django migrations...'
-                sh '${VENV_DIR}/bin/python ${PROJECT_DIR}/manage.py migrate'
+                echo 'Running Django migrations...'
+                sh './venv/bin/python manage.py migrate'
             }
         }
 
         stage('Collect Static Files') {
             steps {
                 echo 'Collecting static files...'
-                sh 'echo yes | ${VENV_DIR}/bin/python ${PROJECT_DIR}/manage.py collectstatic'
+                sh './venv/bin/python manage.py collectstatic --noinput'
             }
         }
 
