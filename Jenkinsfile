@@ -31,20 +31,20 @@ pipeline {
         stage('Run Django Migrations') {
             steps {
                 echo 'Running Django migrations...'
-		dir('iot_project'){
+		
                 sh '''
                     ../venv/bin/python manage.py migrate
                 '''
-		}
+		
             }
         }
 
         stage('Collect Static Files') {
             steps {
                 echo 'Collecting static files...'
-		dir('iot_project'){
+		
                 sh '../venv/bin/python manage.py collectstatic --noinput'
-		}
+		
             }
         }
 
