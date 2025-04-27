@@ -60,27 +60,29 @@ sudo apt-get install jenkins
 
 }
 
-}
-
-{curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee   /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]   https://pkg.jenkins.io/debian-stable binary/ | sudo tee   /etc/apt/sources.list.d/jenkins.list > /dev/null
-sudo apt update
-sudo apt install jenkins -y
-sudo systemctl start jenkins
-sudo systemctl enable jenkins
-sudo systemctl status jenkins}
-
 Visit Jenkins: http://<your-server-ip>:8080
 sudo vim /var/lib/jenkins/secrets/initialAdminPassword
 sudo usermod -aG www-data jenkins
 sudo update-alternatives --config editor
 sudo visudo
 Add this at the bottom: jenkins ALL=(ALL) NOPASSWD: /bin/systemctl restart gunicorn.socket
+
+vim Jenkinsfile             <!-----checkout the file------>
+sudo cp /etc/systemd/system/gunicorn.service .
+sudo cp /etc/systemd/system/gunicorn.socket .
+mkdir nginx
+sudo cp /etc/nginx/sites-available/iot_project nginx/.
+source venv/bin/activate
+pip freeze > requirements.txt
+deactivate 
+
+
 cd ~/iot_project
 git init
 git remote add origin https://github.com/your-username/iot-project.git
 git add .
 git commit -m "Initial commit"
+git branch -M main
 git push -u origin main
 
 Login to Jenkins (http://your-server-ip:8080)
@@ -106,3 +108,13 @@ Jenkinsfile
 Save the job.
 
 vim Jenkinsfile            <!---checkout the file--->
+
+git add Jenkinsfile 
+git commit -m "commit message"
+git push origin main
+
+{
+for iot_project2
+chmod +x venv/bin/*      <!--- add this line to jenkinsfile stage('Setup Virtual Environment') --->
+
+}
