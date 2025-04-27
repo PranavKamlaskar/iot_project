@@ -35,7 +35,7 @@ sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl start gunicorn.socket
 sudo systemctl enable gunicorn.socket
-sudo vim /etc/nginx/sites-available/iot_project            <!---checkout the file--->
+sudo vim /etc/nginx/sites-available/iot_project            <!---checkout the file nginx/iot_project--->
 sudo ln -s /etc/nginx/sites-available/iot_project /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl restart nginx
